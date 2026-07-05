@@ -1,12 +1,16 @@
+import os
+import time
+import random
+
 import torch
 import torch.nn as nn
 import numpy as np
 
 from sklearn.metrics import (
-    accuracy_score, 
-    f1_score, 
-    precision_score, 
-    recall_score, 
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
     confusion_matrix
 )
 
@@ -17,6 +21,26 @@ from torchvision.models import (
     vit_b_32,
     densenet169,
 )
+
+
+def set_seed(seed=42):
+    """Фиксирует генераторы случайных чисел для воспроизводимости.
+
+    Требование методических рекомендаций: фиксировать seed и параметры
+    разбиения, чтобы эксперимент можно было повторить.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def get_model_size_mb(model):
+    """Возвращает размер модели в МБ (сумма параметров, float32)."""
+    num_params = sum(p.numel() for p in model.parameters())
+    size_mb = num_params * 4 / (1024 ** 2)
+    return round(size_mb, 2)
 
 
 def create_model(model_name, num_classes=2):
@@ -102,20 +126,28 @@ def evaluate_model(model, test_loader):
     all_targets = []
 
     total_time = 0
+    use_cuda_events = device == 'cuda'
 
     with torch.no_grad():
         for x, y in test_loader:
             x = x.to(device)
 
-            start = torch.cuda.Event(enable_timing=True)
-            end = torch.cuda.Event(enable_timing=True)
+            if use_cuda_events:
+                # Точный замер на GPU.
+                start = torch.cuda.Event(enable_timing=True)
+                end = torch.cuda.Event(enable_timing=True)
 
-            start.record()
-            outputs = model(x)
-            end.record()
+                start.record()
+                outputs = model(x)
+                end.record()
 
-            torch.cuda.synchronize()
-            total_time += start.elapsed_time(end)
+                torch.cuda.synchronize()
+                total_time += start.elapsed_time(end)
+            else:
+                # Fallback для машин без CUDA (раньше здесь падало).
+                start = time.perf_counter()
+                outputs = model(x)
+                total_time += (time.perf_counter() - start) * 1000
 
             preds = torch.argmax(outputs, dim=1).cpu().numpy()
 

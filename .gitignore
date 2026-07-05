@@ -1,1 +1,26 @@
+# Python
 __pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Большие артефакты (веса, датасеты, отчёты)
+*.pth
+*.zip
+demo_app/history.json
+experiment/models_comparison.csv
+experiment/error_analysis/
+experiment/ACPDS
+experiment/dataset
+praktika/
+
+# IDE / ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

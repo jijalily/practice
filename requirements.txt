@@ -1,0 +1,35 @@
+# Основные библиотеки глубокого обучения.
+# torch и torchvision устанавливаются отдельно в зависимости от версии CUDA:
+#   https://pytorch.org/get-started/locally/
+torch
+torchvision
+
+# Работа с данными и изображениями.
+numpy
+opencv-python
+Pillow
+albumentations
+
+# Метрики и таблицы.
+scikit-learn
+pandas
+openpyxl          # экспорт отчётов в Excel (.xlsx)
+
+# Визуализация.
+matplotlib
+pytorch-grad-cam  # визуализация внимания модели (Grad-CAM)
+
+# Демонстрационное приложение (PyQt6).
+PyQt6
+qt-material       # тёмная тема интерфейса
+
+# Генерация PDF-отчётов.
+reportlab
+
+# Генерация текстового отчёта по практике в формате .docx (generate_report.py).
+python-docx
+
+# Запуск Jupyter-ноутбуков (experiment/train.ipynb — обучение,
+# experiment/test.ipynb — тестирование моделей).
+jupyter
+ipykernel
